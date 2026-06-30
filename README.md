@@ -1,116 +1,52 @@
 # GESTION PERSO SDIS
 
-Appli mobile **Flutter** (projet fictif SDIS 34) : disponibilités, interventions, armement du centre.
+Application mobile **Flutter** de gestion des disponibilités et du suivi des interventions pour sapeurs-pompiers et chefs de garde.
 
-**Contexte fictif** — pas le vrai SDIS 34.
+> **Contexte pédagogique et fictif** — Cette application n’est pas affiliée au SDIS 34 réel. Les données et comptes sont des données de démonstration.
 
 ---
 
-## Lancer l’appli (sans base de données)
+## Présentation
 
-Par défaut l’appli tourne en **mode démo** : toutes les données sont déjà dans le code (`lib/data/mock_data.dart`).  
-**Pas besoin de MySQL, Docker ni serveur** pour tester.
+L’application propose quatre espaces principaux :
 
-### Prérequis
+| Écran | Description |
+|-------|-------------|
+| **Accueil** | Effectifs disponibles, indicateur d’armement, interventions en cours, historique sur 7 jours |
+| **Interventions** | Liste filtrable et fiche détail (personnel et véhicules engagés) |
+| **Planification** | Calendrier des disponibilités personnelles ; vue équipe pour les chefs de garde |
+| **Paramètres** | Profil utilisateur, caserne, déconnexion |
 
-- [Flutter](https://docs.flutter.dev/get-started/install) 3.35+ (Dart 3.9+)
-- Android Studio / VS Code + un émulateur **ou** un téléphone en USB
+Les données de démonstration (personnel, véhicules, interventions, créneaux) sont **incluses dans le dépôt** (`lib/data/mock_data.dart`). Aucune installation de base de données n’est requise pour utiliser l’application en configuration par défaut.
 
-Vérifier :
+---
+
+## Prérequis
+
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) **3.35** ou supérieur (Dart **3.9** ou supérieur)
+- Un émulateur Android, un simulateur iOS, ou un appareil physique configuré pour le débogage USB
+- Git
+
+Vérifier l’environnement :
 
 ```bash
 flutter doctor
 ```
 
-### Installation
+---
+
+## Installation
 
 ```bash
-git clone https://github.com/TON-USERNAME/TON-REPO.git
-cd TON-REPO
+git clone <URL-du-depot>
+cd gestion-perso-sdis
 flutter pub get
 flutter run
 ```
 
-*(Remplace l’URL par la tienne après publication.)*
+Le nom du dossier après clonage dépend du nom du dépôt GitHub ; se placer dans le répertoire qui contient le fichier `pubspec.yaml`.
 
-### Utilisation (mode démo)
-
-1. Au lancement → écran **Connexion**
-2. Appuie sur **Se connecter** (email / mot de passe ignorés)
-3. Navigue avec les **4 onglets** : Accueil, Interventions, Planification, Paramètres
-4. Pour changer de rôle (pompier / chef / admin) : **Paramètres** → « Changer de rôle (Démo) »
-
-Les données (personnel, véhicules, interventions, créneaux) viennent de `lib/data/mock_data.dart`.
-
----
-
-## Où sont les « données » ?
-
-| Mode | Où ça vit | Pour qui |
-|------|-----------|----------|
-| **Démo (défaut)** | `lib/data/mock_data.dart` dans le repo | Clone GitHub, prof, évaluateur |
-| **API + MySQL (optionnel)** | Projet web séparé (Node + Docker) | Si tu as aussi l’appli web BTS |
-
-Le dépôt GitHub **ne contient pas MySQL** : une appli Flutter ne embarque pas une base SQL.  
-Pour un correcteur qui clone le repo, le mode démo suffit et **tout fonctionne tout de suite**.
-
-Config : `lib/config/app_config.dart` → `useMockData = true` (valeur par défaut).
-
----
-
-## Mode API (optionnel)
-
-Uniquement si tu as le **projet web** (API Express port **4000** + MySQL via Docker) sur ta machine.
-
-1. Démarrer l’API (dans le dossier du projet web) :
-
-   ```bash
-   npm run db:up
-   npm run seed
-   npm run dev
-   ```
-
-2. Vérifier : [http://localhost:4000/api/health](http://localhost:4000/api/health)
-
-3. Dans `lib/config/app_config.dart` :
-
-   ```dart
-   static const bool useMockData = false;
-   ```
-
-4. Relancer : `flutter run`
-
-| Appareil | Adresse API (automatique sauf téléphone) |
-|----------|------------------------------------------|
-| Émulateur Android | `10.0.2.2:4000` |
-| PC / simulateur iOS | `127.0.0.1:4000` |
-| Téléphone (même Wi‑Fi) | `flutter run --dart-define=API_HOST=192.168.x.x` |
-
-Comptes de test (mot de passe `demo2026!`) :
-
-- `personnel.limite@sdis34.demo`
-- `encadrement@sdis34.demo`
-- `admin.si@sdis34.demo`
-
----
-
-## Structure utile
-
-```
-lib/
-├── main.dart              # Entrée + Provider
-├── config/app_config.dart # mock ou API
-├── data/mock_data.dart    # Données démo (GitHub)
-├── models/                # Modèles
-├── providers/             # État global
-├── repositories/          # Mock / API
-├── screens/               # Écrans
-└── auth/                  # Connexion
-```
-
----
-
-## Tests
+Compilation des tests automatisés (optionnel) :
 
 ```bash
 flutter test
@@ -118,30 +54,110 @@ flutter test
 
 ---
 
-## Publier / mettre à jour avec GitHub Desktop
+## Connexion
 
-À faire **une seule fois** :
+Au premier lancement, l’application affiche un écran de connexion. Le comportement dépend du mode configuré dans `lib/config/app_config.dart` (par défaut : **mode démo**).
 
-1. Sur [github.com](https://github.com) → **New repository** → nom ex. `gestion-perso-sdis` → **sans** README (tu en as déjà un)
-2. Ouvre **GitHub Desktop** → **File** → **Add local repository**
-3. Choisis le dossier **`GESTION PERSO SDIS`** (celui qui contient `pubspec.yaml` et ce README)
-4. Si GitHub Desktop propose **Initialize repository** → accepte
-5. Tous les fichiers cochés → message de commit ex. `Initial commit — appli Flutter mode démo`
-6. **Commit to main** puis **Publish repository**
+### Mode démo (configuration par défaut)
 
-Ensuite, à chaque modif :
+`useMockData = true` — aucun serveur requis.
 
-1. GitHub Desktop affiche les fichiers changés
-2. Résumé du commit → **Commit to main** → **Push origin**
+| Champ | Valeur |
+|-------|--------|
+| Email | Tout email valide, ou laisser vide |
+| Mot de passe | Tout mot de passe, ou laisser vide |
 
-**Important :**
+**Procédure :** appuyer sur **Se connecter**. L’identité affichée par défaut est celle du chef de garde de démonstration (**Pierre Durand**, caserne fictive).
 
-- Publie **uniquement** le dossier `GESTION PERSO SDIS`, pas tout `SITUATION 1` (sinon tu envoies les PDF de TP, Word, etc.)
-- Le dossier `docs/` (rapport BTS, textes Word) est **ignoré** par Git → il reste sur ton PC, pas sur GitHub
-- Ne commite pas `.env`, mots de passe, ni le dossier `build/`
+Pour tester les autres profils sans se reconnecter :
+
+1. Aller dans **Paramètres**
+2. Section **Changer de rôle (Démo)**
+3. Choisir **Pompier**, **Chef de garde** ou **Admin**
+
+| Rôle | Accès spécifique |
+|------|------------------|
+| **Pompier** | Planification personnelle uniquement |
+| **Chef de garde** | Planification personnelle + vue **Équipe** (validation des créneaux, filtres A / B / C) |
+| **Admin** | Même accès que le chef de garde dans cette version de démonstration |
 
 ---
 
-## Dépendances principales
+### Mode API (optionnel)
 
-`provider`, `dio`, `table_calendar`, `intl`, `flutter_secure_storage` — voir `pubspec.yaml`.
+`useMockData = false` — nécessite une API REST (Express, port **4000**) et une base MySQL alimentée, généralement via le projet web associé. Ce mode n’est **pas requis** pour évaluer l’application depuis ce dépôt.
+
+**Mot de passe commun à tous les comptes de démonstration :** `demo2026!`
+
+| Profil | Email | Mot de passe |
+|--------|-------|--------------|
+| Personnel (pompier) | `personnel.limite@sdis34.demo` | `demo2026!` |
+| Chef de garde (Pierre) | `pierre.durand@sdis34.demo` | `demo2026!` |
+| Encadrement / officier (Sarah) | `sarah.lopez@sdis34.demo` | `demo2026!` |
+| Encadrement (générique) | `encadrement@sdis34.demo` | `demo2026!` |
+| Administrateur SI | `admin.si@sdis34.demo` | `demo2026!` |
+| Opérateur poste | `operateur@sdis34.demo` | `demo2026!` |
+
+Des raccourcis sur l’écran de connexion permettent de préremplir certains de ces comptes lorsque le mode API est actif.
+
+**Activation du mode API :**
+
+1. Démarrer l’API sur la machine hôte (port 4000) et vérifier `http://localhost:4000/api/health`
+2. Dans `lib/config/app_config.dart`, définir `useMockData = false`
+3. Relancer l’application avec `flutter run`
+
+| Environnement d’exécution | Adresse de l’API |
+|---------------------------|------------------|
+| Émulateur Android | `http://10.0.2.2:4000` (automatique) |
+| Simulateur iOS / application desktop | `http://127.0.0.1:4000` (automatique) |
+| Appareil physique (même réseau Wi‑Fi) | `flutter run --dart-define=API_HOST=<IP-du-PC>` |
+
+---
+
+## Utilisation
+
+1. **Connexion** selon le mode (voir section ci-dessus).
+2. **Accueil** — consulter les indicateurs ; appuyer sur *Disponibles* ou *Armement* pour afficher le détail.
+3. **Interventions** — filtrer la liste (*Toutes*, *En cours*, *Terminées*) ; ouvrir une fiche au toucher.
+4. **Planification** — sélectionner une date sur le calendrier ; ajouter une disponibilité via le bouton **+** (type de créneau, horaires, notification au chef de garde).
+5. **Paramètres** — consulter le profil ; **Déconnexion** pour quitter la session.
+
+En mode démo, la session peut être mémorisée entre deux lancements de l’application.
+
+---
+
+## Architecture du projet
+
+```
+lib/
+├── main.dart                 # Point d’entrée, injection Provider
+├── config/app_config.dart    # Mode démo / API, URL du serveur
+├── data/mock_data.dart       # Jeu de données de démonstration
+├── models/                   # Modèles métier
+├── providers/app_state.dart  # État global de l’application
+├── repositories/           # Accès aux données (mock ou API)
+├── api/                      # Client HTTP et conversion JSON
+├── screens/                  # Écrans et navigation
+└── auth/                     # Authentification et session
+```
+
+---
+
+## Technologies
+
+| Composant | Usage |
+|-----------|--------|
+| **Flutter / Dart** | Interface mobile |
+| **Provider** | Gestion d’état |
+| **Dio** | Appels REST vers l’API (mode API) |
+| **table_calendar** | Calendrier de planification |
+| **intl** | Formatage des dates (fr_FR) |
+| **flutter_secure_storage** | Persistance sécurisée de la session |
+
+Liste complète des dépendances : fichier `pubspec.yaml`.
+
+---
+
+## Licence et usage
+
+Projet à vocation **pédagogique**. Données et identifiants **fictifs**. Toute utilisation en dehors d’un cadre de démonstration ou d’évaluation doit respecter la réglementation applicable et ne pas laisser supposer un lien avec un service de secours réel.
